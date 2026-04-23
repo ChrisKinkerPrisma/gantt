@@ -544,7 +544,9 @@ class F {
           y: s.offsetY || s.layerY,
           task: this.task,
           target: this.$bar
-        }), this.gantt.$container.querySelector(`.highlight-${t}`).classList.remove("hide");
+        });
+        const r = this.gantt.$container.scrollLeft;
+        this.gantt.$container.querySelector(`.highlight-${t}`).classList.remove("hide"), this.gantt.$container.scrollLeft = r;
       }, 200);
     }), p.on(this.group, "mouseleave", () => {
       var s, r;
@@ -728,7 +730,7 @@ function O(n, t, e) {
   let i = _.add(n, 6, "day"), s = i.getMonth() !== n.getMonth() ? "D MMM" : "D", r = !t || n.getMonth() !== t.getMonth() ? "D MMM" : "D";
   return `${_.format(n, r, e)} - ${_.format(i, s, e)}`;
 }
-const b = [
+const w = [
   {
     name: "Hour",
     padding: "7d",
@@ -841,7 +843,7 @@ const b = [
   today_button: !0,
   view_mode: "Day",
   view_mode_select: !1,
-  view_modes: b,
+  view_modes: w,
   is_weekend: (n) => n.getDay() === 0 || n.getDay() === 6
 };
 class z {
@@ -880,7 +882,7 @@ class z {
   setup_options(t) {
     this.original_options = t, t != null && t.view_modes && (t.view_modes = t.view_modes.map((i) => {
       if (typeof i == "string") {
-        const s = b.find(
+        const s = w.find(
           (r) => r.name === i
         );
         return s || console.error(
@@ -888,7 +890,7 @@ class z {
         ), s;
       }
       return i;
-    }), t.view_mode = t.view_modes[0]), this.options = { ...B, ...t };
+    }), t.view_mode || (t.view_mode = t.view_modes[0])), this.options = { ...B, ...t };
     const e = {
       "grid-height": "container_height",
       "bar-height": "bar_height",
@@ -919,7 +921,8 @@ class z {
       this.config.ignored_function = this.options.ignore;
   }
   update_options(t) {
-    this.setup_options({ ...this.original_options, ...t }), this.change_view_mode(void 0, !0);
+    const e = this.config.view_mode;
+    this.setup_options({ ...this.original_options, ...t }), this.change_view_mode(e, !0);
   }
   setup_tasks(t) {
     this.tasks = t.map((e, i) => {
@@ -961,9 +964,10 @@ class z {
     Object.assign(i, e), s.refresh();
   }
   change_view_mode(t = this.options.view_mode, e = !1) {
-    typeof t == "string" && (t = this.options.view_modes.find((r) => r.name === t));
-    let i, s;
-    e && (i = this.$container.scrollLeft, s = this.options.scroll_to, this.options.scroll_to = null), this.options.view_mode = t.name, this.config.view_mode = t, this.update_view_scale(t), this.setup_dates(e), this.render(), e && (this.$container.scrollLeft = i, this.options.scroll_to = s), this.trigger_event("view_change", [t]);
+    const i = typeof t == "string" ? t : t.name, s = this.options.view_modes.find((h) => h.name === i) || {};
+    t = { ...w.find((h) => h.name === i) || {}, ...s };
+    let o, a;
+    e && (o = this.$container.scrollLeft, a = this.options.scroll_to, this.options.scroll_to = null), this.options.view_mode = t.name, this.config.view_mode = t, this.update_view_scale(t), this.setup_dates(e), this.render(), e && (this.$container.scrollLeft = o, this.options.scroll_to = a), this.trigger_event("view_change", [t]);
   }
   update_view_scale(t) {
     let { duration: e, scale: i } = _.parse_duration(t.step);
@@ -1525,7 +1529,7 @@ class z {
     p.on(this.$container, "scroll", (d) => {
       let l = [];
       const c = this.bars.map(
-        ({ group: w }) => w.getAttribute("data-id")
+        ({ group: b }) => b.getAttribute("data-id")
       );
       let u;
       i && (u = d.currentTarget.scrollLeft - i), this.current_date = _.add(
@@ -1538,7 +1542,7 @@ class z {
         null,
         this.options.language
       ), m = this.upperTexts.find(
-        (w) => w.textContent === y
+        (b) => b.textContent === y
       );
       this.current_date = _.add(
         this.gantt_start,
@@ -1549,7 +1553,7 @@ class z {
         null,
         this.options.language
       ), m = this.upperTexts.find(
-        (w) => w.textContent === y
+        (b) => b.textContent === y
       ), m !== this.$current && (this.$current && this.$current.classList.remove("current-upper"), m.classList.add("current-upper"), this.$current = m), i = d.currentTarget.scrollLeft;
       let [E, H, X] = this.get_start_end_positions();
       i > X + 100 ? (this.$adjust.innerHTML = "&larr;", this.$adjust.classList.remove("hide"), this.$adjust.onclick = () => {
@@ -1562,8 +1566,8 @@ class z {
           left: E,
           behavior: "smooth"
         });
-      }) : this.$adjust.classList.add("hide"), u && (l = c.map((w) => this.get_bar(w)), this.options.auto_move_label && l.forEach((w) => {
-        w.update_label_position_on_horizontal_scroll({
+      }) : this.$adjust.classList.add("hide"), u && (l = c.map((b) => this.get_bar(b)), this.options.auto_move_label && l.forEach((b) => {
+        b.update_label_position_on_horizontal_scroll({
           x: u,
           sx: d.currentTarget.scrollLeft
         });
@@ -1716,13 +1720,13 @@ class z {
   }
 }
 z.VIEW_MODE = {
-  HOUR: b[0],
-  QUARTER_DAY: b[1],
-  HALF_DAY: b[2],
-  DAY: b[3],
-  WEEK: b[4],
-  MONTH: b[5],
-  YEAR: b[6]
+  HOUR: w[0],
+  QUARTER_DAY: w[1],
+  HALF_DAY: w[2],
+  DAY: w[3],
+  WEEK: w[4],
+  MONTH: w[5],
+  YEAR: w[6]
 };
 function N(n) {
   return n.name + "_" + Math.random().toString(36).slice(2, 12);
