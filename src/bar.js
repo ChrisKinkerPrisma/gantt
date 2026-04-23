@@ -632,20 +632,12 @@ export default class Bar {
     }
 
     compute_duration() {
-        // Use actual time difference for precise sub-day durations
-        const MS_PER = {
-            millisecond: 1,
-            second: 1000,
-            minute: 60000,
-            hour: 3600000,
-            day: 86400000,
-        };
-        const diff_ms = this.task._end - this.task._start;
-        const ms_per_unit =
-            MS_PER[this.gantt.config.unit] || MS_PER.day;
-
         this.duration =
-            diff_ms / ms_per_unit / this.gantt.config.step;
+            date_utils.diff(
+                this.task._end,
+                this.task._start,
+                this.gantt.config.unit,
+            ) / this.gantt.config.step;
 
         // Count days for ignored dates logic
         let actual_duration_in_days = 0,
