@@ -87,8 +87,10 @@ export default class Gantt {
                 }
                 return mode;
             });
-            // automatically set the view mode to the first option
-            options.view_mode = options.view_modes[0];
+            // only set default view mode if none was explicitly provided
+            if (!options.view_mode) {
+                options.view_mode = options.view_modes[0];
+            }
         }
         this.options = { ...DEFAULT_OPTIONS, ...options };
         const CSS_VARIABLES = {
@@ -133,8 +135,9 @@ export default class Gantt {
     }
 
     update_options(options) {
+        const current_view_mode = this.config.view_mode;
         this.setup_options({ ...this.original_options, ...options });
-        this.change_view_mode(undefined, true);
+        this.change_view_mode(current_view_mode, true);
     }
 
     setup_tasks(tasks) {

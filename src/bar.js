@@ -381,9 +381,13 @@ export default class Bar {
                         task: this.task,
                         target: this.$bar,
                     });
+                // Preserve scroll position — showing the highlight inside the
+                // sticky header can cause the browser to recalculate scroll
+                const scrollLeft = this.gantt.$container.scrollLeft;
                 this.gantt.$container
                     .querySelector(`.highlight-${task_id}`)
                     .classList.remove('hide');
+                this.gantt.$container.scrollLeft = scrollLeft;
             }, 200);
         });
         $.on(this.group, 'mouseleave', () => {
